@@ -4,7 +4,7 @@ Make sure your device has npm and node installed
 npm -v //to check version of npm
 node -v //to check version of node
 
-open your project folder and run the below command
+Open your project folder and run the below command
 npx create-react-app ipl-data-dash
 
 A new dir ipl-data-dash gets created, go to that dir
@@ -19,10 +19,10 @@ npm init -y
 npm install express
 
 3) Back-end
-make sure u have mongo installed. Follow this link
-check installation by mongosh
-then download the .csv file and run LoadCSV.java
-check if cricket db is in mongo by typing show databases in mongosh
+Make sure u have mongo installed. Follow this link
+Check installation by mongosh
+Then download the .csv file and run LoadCSV.java
+Check if cricket db is in mongo by typing show databases in mongosh
 
 Running
 Open terminal and type:
