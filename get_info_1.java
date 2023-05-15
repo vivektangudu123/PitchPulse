@@ -3,10 +3,12 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import org.bson.Document;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.text.DecimalFormat;
 
 public class get_info {
     public static int innings_played(String name,MongoCollection<Document>  collection)
@@ -319,9 +321,9 @@ public class get_info {
             }
             if(count==1)
             {
-                // System.out.println("Season" +" :  Highest Score");
+                System.out.println("Season" +"   Highest Score");
             }
-            System.out.println("Year - " + doc.get("season")+"  :  Highest Score - "+doc.get("highest_count"));
+            System.out.println(doc.get("season")+"     "+doc.get("highest_count"));
         }
         return 0;
 
@@ -329,22 +331,18 @@ public class get_info {
     public static int head_to_head(String name,MongoCollection<Document>  collection)
     {
         List<Document> pipeline = Arrays.asList(
-            new Document("$match", new Document("Team1", name)),
-            new Document("$group", new Document("_id", "$Team2")
-                                    .append("count", new Document("$addToSet", "$ID"))),
-            new Document("$project", new Document("_id", 0)
-                                    .append("Team2", "$_id")
-                                    .append("count", new Document("$size", "$count")))   
-        );
+            new Document("$match", new Document("Team2", name)),
+    new Document("$group", new Document("_id", "$Team1")
+                            .append("count", new Document("$addToSet", "$ID"))),
+    new Document("$project", new Document("count", new Document("$size", "$count")))
+);
         AggregateIterable<Document> result = collection.aggregate(pipeline);
         
         List<Document> pipeline2 = Arrays.asList(
-            new Document("$match", new Document("Team2", name)),
-            new Document("$group", new Document("_id", "$Team1")
+            new Document("$match", new Document("Team1", name)),
+            new Document("$group", new Document("_id", "$Team2")
                                     .append("count", new Document("$addToSet", "$ID"))),
-            new Document("$project", new Document("_id", 0)
-                                    .append("Team1", "$_id")
-                                    .append("count", new Document("$size", "$count")))   
+            new Document("$project", new Document("count", new Document("$size", "$count")))
         );
         AggregateIterable<Document> result2 = collection.aggregate(pipeline2);
         int count=0;
@@ -357,10 +355,10 @@ public class get_info {
                 String team1 = doc1.getString("_id");
                 String countSet2 = (String) doc1.get("Team1");
                 int count2=(int)doc1.get("count");
-                //
-                if(countSet1.equals(countSet2))
+                String s=String.valueOf(count1+count2);
+                if(team1.equals(team2))
                 {
-                    System.out.println(countSet2+": "+ count1+count2);
+                    System.out.println(team1+" "+s);
                 }
             }
         }
@@ -372,54 +370,47 @@ public class get_info {
         return 0;
     }
     public static void main(String[] args) {
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
         MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
         MongoDatabase database = mongoClient.getDatabase("cricket");
         MongoCollection<Document> collection = database.getCollection("ipl");
 
-        String[] query = args[0].split("@", -1);
-        int fun = Integer.parseInt(query[0]);
-        int limit = 10;
-        int season = 0;
-        if(fun > 0){
-            limit=Integer.parseInt(query[1])-1;
-            season=Integer.parseInt(query[2]);
-        }
-        // int fun=2;
+        int fun=-1;
+        int limit=10;
+        int season=0;
 
         if(fun==-1){
-            String name = query[1];
-            int innings_=innings_played(name,collection);
+        String name ="Mumbai Indians";
+        int innings_=innings_played(name,collection);
 
+        if(innings_!=0){
+        System.out.println("innings: "+innings_);  
+        int total_runs_=total_runs(name,collection);
+        System.out.println("total_runs:  "+total_runs_);
+        System.out.println("average:  "+total_runs_/innings_);
+        System.out.println("total_centuries:  "+centuries(name,collection));
+        System.out.println("half_centuries:  "+half_centuries(name,collection));
+        System.out.println("high_score:  "+high_score(name,collection));
+        System.out.println("Strike_rate:  "+strike_rate(name,collection));
+        System.out.println("fours: "+total_fours(name,collection,4));
+        System.out.println("sixes: "+total_fours(name,collection,6));
+        System.out.println("wickets: "+total_wickets(name,collection));
+        System.out.println("5_wicket_haul: "+ wicket_5(name,collection,4));
+        System.out.println("4_wicket_haul: "+ wicket_5(name,collection,3));
+        System.out.println("economy: "+ economy(name,collection));
+        System.out.println("runs: "+ total_runs_bowler(name,collection));
+        System.out.println("maidens: "+ maidens(name,collection));}
 
-            if(innings_!=0){
-                System.out.println("Innings: "+innings_);  
-                int total_runs_=total_runs(name,collection);
-                System.out.println("Total_runs:  "+total_runs_);
-                System.out.println("Average:  "+total_runs_/innings_);
-                System.out.println("Total_centuries:  "+centuries(name,collection));
-                System.out.println("Half_centuries:  "+half_centuries(name,collection));
-                System.out.println("High_score:  "+high_score(name,collection));
-                System.out.println("Strike_rate:  "+strike_rate(name,collection));
-                System.out.println("Fours: "+total_fours(name,collection,4));
-                System.out.println("Sixes: "+total_fours(name,collection,6));
-                System.out.println("Wickets: "+total_wickets(name,collection));
-                System.out.println("5_wicket_haul: "+ wicket_5(name,collection,4));
-                System.out.println("4_wicket_haul: "+ wicket_5(name,collection,3));
-                System.out.println("Economy: "+ economy(name,collection));
-                System.out.println("Runs: "+ total_runs_bowler(name,collection));
-                System.out.println("Maidens: "+ maidens(name,collection));
-            }
-
-            else{
-                int team_innings=innings_played_team(name,collection,"BattingTeam");
-                if(team_innings!=0){
-                    // System.out.println(" ");submit
-                    System.out.println("Total_matches: "+ team_innings);
-                    System.out.println("Won: "+ innings_played_team(name,collection,"WinningTeam"));
-                    // System.out.println(" ");
-                    highest_season(name,collection);
-                    // System.out.println(" ");
-                    head_to_head(name,collection);}
+        else{
+            int team_innings=innings_played_team(name,collection,"BattingTeam");
+            if(team_innings!=0){
+                System.out.println(" ");
+        System.out.println("total_matches: "+ team_innings);
+        System.out.println("Won: "+ innings_played_team(name,collection,"WinningTeam"));
+        System.out.println(" ");
+        highest_season(name,collection);
+        System.out.println(" ");
+        head_to_head(name,collection);}
         }}
 
 
@@ -438,7 +429,7 @@ public class get_info {
             AggregateIterable<Document> result = collection.aggregate(pipeline);
             int count=0;
             for (Document doc : result) {
-                System.out.println(doc.get("_id")+": "+doc.get("total_runs"));
+                System.out.println(doc.get("_id")+" "+doc.get("total_runs"));
                 count++;
                 if(count>limit)
                 {
@@ -446,9 +437,46 @@ public class get_info {
                 }
             }
         }
+        if(fun==10)
+        {
+            String mapFunction = "function() {" +
+            "    if (this.Season==2022) {" +
+            "        emit(this.batter, this.batsman_run);" +
+            "    }" +
+            "}";
+    
+    String reduceFunction = "function(key, values) {" +
+            "    return Array.sum(values);" +
+            "}";
+    MapReduceIterable<Document> result = collection.mapReduce(mapFunction, reduceFunction).sort(new Document("values", -1));
+    
+    List<Document> sortedResult = new ArrayList<>();
+for (Document doc : result) {
+    sortedResult.add(doc);
+}
+sortedResult.sort((doc1, doc2) -> {
+    Double totalRuns1 = doc1.getDouble("value");
+    Double totalRuns2 = doc2.getDouble("value");
+    return Double.compare(totalRuns2, totalRuns1);
+});
+    
+    int count=0;
+    for (Document doc : sortedResult) {
+        String batter = doc.getString("_id");
+        Double totalRuns = doc.getDouble("value");
+        System.out.println("Batter: " + batter + ", Total Runs: " + totalRuns);
+        //System.out.println(doc);
+        count++;
+        if(count>10)
+        {
+            break;
+        }
+    }
+        }
         //centuries
         if(fun==2)
         {
+
             List<Document> pipeline = new ArrayList<>();
 
 
@@ -465,7 +493,7 @@ public class get_info {
             int count=0;
         
             for (Document doc : result) {
-                System.out.println(doc.get("_id")+": "+doc.get("count"));
+                System.out.println(doc.get("_id")+"   "+doc.get("count"));
                 count++;
                 if(count>limit)
                 {
@@ -492,7 +520,7 @@ public class get_info {
             int count=0;
         
             for (Document doc : result) {
-                System.out.println(doc.get("_id")+": "+doc.get("count"));
+                System.out.println(doc.get("_id")+" "+doc.get("count"));
                 count++;
                 if(count>limit)
                 {
@@ -525,7 +553,9 @@ public class get_info {
             int count=0;
         
             for (Document doc : result) {
-                System.out.println(doc.get("batter")+": "+doc.get("batsman_run_per_ball"));
+                Double aa= doc.getDouble("batsman_run_per_ball");
+                String roundedNumber = decimalFormat.format(100*aa);
+                System.out.println(doc.get("batter")+" "+roundedNumber);
                 count++;
                 if(count>limit)
                 {
@@ -549,7 +579,7 @@ public class get_info {
             int count=0;
         
             for (Document doc : result) {
-                System.out.println(doc.get("_id")+": "+doc.get("count"));
+                System.out.println(doc.get("_id")+" "+doc.get("count"));
                 count++;
                 if(count>limit)
                 {
@@ -572,7 +602,7 @@ public class get_info {
             int count=0;
         
             for (Document doc : result) {
-                System.out.println(doc.get("_id")+": "+doc.get("count"));
+                System.out.println(doc.get("_id")+" "+doc.get("count"));
                 count++;
                 if(count>limit)
                 {
@@ -595,7 +625,7 @@ public class get_info {
             int count=0;
         
             for (Document doc : result) {
-                System.out.println(doc.get("_id")+": "+doc.get("count"));
+                System.out.println(doc.get("_id")+" "+doc.get("count"));
                 count++;
                 if(count>limit)
                 {
@@ -624,7 +654,7 @@ public class get_info {
         
             for (Document doc : result) {
                 Document aa=(Document)doc.get("_id");
-                System.out.println(aa.get("bowler")+": "+doc.get("count"));
+                System.out.println(aa.get("bowler")+" "+doc.get("count"));
                 count++;
                 if(count>limit)
                 {
