@@ -20,9 +20,7 @@ Move `project/src` folder into `ipl-data-dash` by replacing the existing one.
 This completes the setup for front-end
 
 ### Nodejs connection
-Download `Mongo` to the directory of project
-\
-Go to `Mongo/server` and type following cmds
+Go to `project/Mongo/server` and type following cmds
 \
 \
 `npm init -y`
