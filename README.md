@@ -6,14 +6,16 @@ Make sure your device has npm and node installed
 \
 `node -v` - to check version of node
 
-Create a new directory for the project, open the folder in terminal and run the below command
+Download `Nosql_Mini_project_ipl_dash_board.zip` and extract the contents `git-deliverable.zip` to a new folder `project`
+\
+Make sure `project` folder contains two folders `Mongo` and `src`. Open this folder in terminal
 \
 `npx create-react-app ipl-data-dash`
 
 A new dir ipl-data-dash gets created, go to that dir and run the below command to install build modules
 `npm run build`
 
-Replace the `src` folder in `ipl-data-dash` with the `src` folder provided.
+Move `project/src` folder into `ipl-data-dash` by replacing the existing one.
 
 This completes the setup for front-end
 
@@ -33,15 +35,17 @@ This completes setup for the connection
 ### Back-end Setup
 Make sure u have mongo installed. Follow this link
 Check installation by `mongosh`
-Then download the `Mongo/IPL_Ball.csv file and run LoadCSV.java
-Check if cricket db is in mongo by typing show databases in mongosh
+If mongo is set, then run the `Mongo/LoadCSV.java`. Edit the location of csv file in the Java code based on your device.
+Check if `cricket` db is loaded mongodb by typing `show databases` in `mongosh`
 
-Running
-Open terminal and type:
-sudo systemctl start mongod
+### Running
+Open terminal and run:
+`sudo systemctl start mongod`
 
-Now open two terminals. In one terminal open ipl-data-dash and another Mongo
-in ipl-data-dash run: npm start
-in Mongo run: node server/server.js
+Now open two terminals:
+1) In one terminal open `project/ipl-data-dash` and run `npm start`
+2) In the other terminal open `project/Mongo` and run `node server/server.js`
 
-DONE Thankyou
+You will have the website running on your localport 3000 and server at localport 3001!
+
+Thankyou!
